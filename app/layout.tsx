@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 import Providers from "../providers";
+import Sidebar from "./dashboard/_components/_sidebar/Sidebar";
 
 export default function RootLayout({
   children,
@@ -19,6 +20,7 @@ export default function RootLayout({
     <html lang="es">
       <body className={inter.className}>
         <Providers>
+
           {children}
         </Providers>
       </body>
