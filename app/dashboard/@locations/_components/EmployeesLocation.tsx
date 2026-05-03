@@ -1,17 +1,13 @@
 import { Employee } from "@/entities";
 import axios from "axios";
-import { API_URL, TOKEN_NAME } from "@/constants";
-import { cookies } from "next/headers";
+import { API_URL } from "@/constants";
+import { AuthHeaders } from "@/helpers/authHeaders";
 
 export default async function EmployeesLocation({ store }: { store: string | string[] | undefined }) {
     if (!store) return null;
 
-    const token = (await cookies()).get(TOKEN_NAME)?.value;
-    const { data } = await axios.get<Employee[]>(`${API_URL}/employees/location/${store}`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    const authHeader = await AuthHeaders();
+    const { data } = await axios.get<Employee[]>(`${API_URL}/employees/location/${store}`, authHeader);
 
     if (!data || data.length === 0) {
         return (

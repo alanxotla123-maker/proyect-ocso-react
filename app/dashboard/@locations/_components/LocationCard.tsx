@@ -1,22 +1,18 @@
 import { Location } from "@/entities"
 import axios from "axios"
-import { cookies } from "next/headers";
-import { API_URL, TOKEN_NAME } from "@/constants";
+import { API_URL } from "@/constants";
 import Link from "next/link";
+import { AuthHeaders } from "@/helpers/authHeaders";
 
 export default async function LocationCard({ store }: { store: string | string[] | undefined }) {
     if (!store || store === "0") {
         return null;
     }
 
-    const userCookies = await cookies();
-    const token = userCookies.get(TOKEN_NAME)?.value;
+
+    const authHeader = await AuthHeaders();
     const { data } = await axios.get<Location>(`${API_URL}/locations/${store}`,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
+        authHeader
     )
 
     return (

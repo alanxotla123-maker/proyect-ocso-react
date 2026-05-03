@@ -1,29 +1,28 @@
 
 import { Location, Manager } from "@/entities";
-import { API_URL, TOKEN_NAME } from "@/constants";
+import { API_URL } from "@/constants";
 import LocationSelect from "./_components/LocationSelect";
-import { cookies } from "next/headers";
 import axios from "axios";
 import LocationCard from "./_components/LocationCard";
 import FormNewLocation from "./_components/FormNewLocation";
+import DeleteLocationButton from "./_components/DeleteLocationButton";
+import { AuthHeaders } from "@/helpers/authHeaders";
 
 const LocationsPage = async ({ searchParams }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
     const resolvedSearchParams = await searchParams;
-    const userCookies = await cookies();
-    const token = userCookies.get(TOKEN_NAME)?.value;
 
-    const headers = { Authorization: `Bearer ${token}` };
+    const authHeader = await AuthHeaders();
 
     let { data } = await axios.get<Location[]>(
         `${API_URL}/locations`,
-        { headers }
+        authHeader
     );
 
     const { data: managers } = await axios.get<Manager[]>(
         `${API_URL}/managers`,
-        { headers }
+        authHeader
     );
 
     data = [
@@ -45,7 +44,13 @@ const LocationsPage = async ({ searchParams }: {
                 <div className="w-1/2">
                     <LocationCard store={resolvedSearchParams.store} />
                 </div>
-                <FormNewLocation managers={managers} locations={data} />
+                {!resolvedSearchParams.store ? (
+                    <div className="w-6/12">
+                        <FormNewLocation managers={managers} locations={data} />
+                    </div>
+                ) : (
+                    <DeleteLocationButton store={resolvedSearchParams.store} />
+                )}
             </div>
         </div>
     );
