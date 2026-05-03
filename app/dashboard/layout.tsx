@@ -9,9 +9,9 @@ export default function DashboardLayout({
     locations: React.ReactNode
 }>) {
     return (
-        <div className="bg-orange-50s">
+        <div className="bg-orange-50 min-h-screen">
             <Header />
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-start">
                 <Sidebar />
                 {children}
                 {locations}

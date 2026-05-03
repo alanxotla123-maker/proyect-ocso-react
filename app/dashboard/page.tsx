@@ -8,9 +8,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
 
     return (
         <>
-            <div className="h-full w-4/12 overflow-hidden overflow-y-auto flex flex-col gap-10">
+            <div className="h-[90vh] w-4/12 overflow-y-auto flex flex-col gap-4 p-6">
                 {store ? (<EmployeesLocation store={store} />) : (
-                    <div className="w-full h-full flex items-center justify-center text-xl font-semibold">
+                    <div className="w-full h-full flex items-center justify-center text-xl font-semibold text-gray-400">
                         Selecciona una tienda
                     </div>
                 )}

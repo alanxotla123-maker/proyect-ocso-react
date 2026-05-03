@@ -14,7 +14,7 @@ export default function LocationSelect(
 
     const router = useRouter();
     return (
-        <Select label="Tiendas"
+        <Select label="Tienda"
             placeholder="Selecciona una tienda" classNames={{
                 mainWrapper: "ring-2 ring-red-300 rounded-xl transition-all"
 
