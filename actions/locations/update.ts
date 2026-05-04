@@ -4,9 +4,8 @@ import { API_URL } from "@/constants";
 import { AuthHeaders } from "@/helpers/authHeaders";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { Location } from "@/entities";
 
-async function createLocation(formData: FormData) {
+async function updateLocation(locationId: number, formData: FormData) {
     const location: any = {
         locationName: formData.get("locationName"),
         locationAddress: formData.get("locationAddress"),
@@ -21,35 +20,30 @@ async function createLocation(formData: FormData) {
         location.manager = manager;
     }
 
-    console.log("Sending location:", location);
-
     const authHeader = await AuthHeaders();
 
     try {
-        const response = await fetch(`${API_URL}/locations`, {
-            method: "POST",
+        const response = await fetch(`${API_URL}/locations/${locationId}`, {
+            method: "PATCH",
             body: JSON.stringify(location),
             headers: {
                 ...authHeader.headers,
                 "Content-Type": "application/json"
             }
         });
-        const data: Location = await response.json();
-        if (response.status === 201) {
 
-            revalidatePath("/dashboard", "page");
-            redirect(`/dashboard/?store=${data.locationId}`);
-        }
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Error al crear la ubicación");
+            throw new Error(errorData.message || "Error al actualizar la ubicación");
         }
 
     } catch (error: any) {
-        console.error("Error:", error);
-        throw new Error(error.message || "Error al crear la ubicación");
+        if (error.message === "NEXT_REDIRECT") throw error;
+        console.error("Error updating location:", error);
+        throw new Error(error.message || "Error al actualizar la ubicación");
     }
 
+    revalidatePath("/dashboard", "page");
 }
 
-export default createLocation;
+export default updateLocation;

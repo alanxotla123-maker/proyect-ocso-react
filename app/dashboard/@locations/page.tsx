@@ -5,6 +5,8 @@ import LocationCard from "./_components/LocationCard";
 import FormNewLocation from "./_components/FormNewLocation";
 import DeleteLocationButton from "./_components/DeleteLocationButton";
 import { AuthHeaders } from "@/helpers/authHeaders";
+import { UpdateLocation } from "./_components/UpdateLocation";
+import FormUpdateLocation from "./_components/FormUpdateLocation";
 
 const LocationsPage = async ({ searchParams }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -12,15 +14,19 @@ const LocationsPage = async ({ searchParams }: {
     const resolvedSearchParams = await searchParams;
     const authHeader = await AuthHeaders();
 
-    const response = await fetch(`${API_URL}/locations`, {
-        headers: authHeader.headers,
-        method: "GET",
-        next: {
-            tags: ["dashboard:locations"]
-        }
-    });
+    const [resLocations, resManagers] = await Promise.all([
+        fetch(`${API_URL}/locations`, {
+            headers: authHeader.headers,
+            next: { tags: ["dashboard:locations"] }
+        }),
+        fetch(`${API_URL}/managers`, {
+            headers: authHeader.headers,
+            next: { tags: ["dashboard:managers"] }
+        })
+    ]);
 
-    let data: Location[] = await response.json();
+    let data: Location[] = await resLocations.json();
+    const managers: Manager[] = await resManagers.json();
 
     data = [
         {
@@ -47,7 +53,16 @@ const LocationsPage = async ({ searchParams }: {
                         <FormNewLocation store={resolvedSearchParams.store} />
                     </div>
                 ) : (
-                    <DeleteLocationButton store={resolvedSearchParams.store} />
+                    <div className="flex flex-col gap-4">
+                        <DeleteLocationButton store={resolvedSearchParams.store} />
+                        <UpdateLocation>
+                            <FormUpdateLocation 
+                                store={resolvedSearchParams.store} 
+                                managers={managers} 
+                                locations={data} 
+                            />
+                        </UpdateLocation>
+                    </div>
                 )}
             </div>
         </div>

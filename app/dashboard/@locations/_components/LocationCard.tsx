@@ -1,28 +1,48 @@
-import { Location } from "@/entities"
-import axios from "axios"
-import { API_URL } from "@/constants";
-import Link from "next/link";
+import { UpdateLocation } from "./UpdateLocation";
+import FormUpdateLocation from "./FormUpdateLocation";
 import { AuthHeaders } from "@/helpers/authHeaders";
+import { API_URL } from "@/constants";
+import { Location, Manager } from "@/entities"; // 👈 Asegúrate de importar Manager
 
 export default async function LocationCard({ store }: { store: string | string[] | undefined }) {
     if (!store || store === "0") {
         return null;
     }
 
-
     const authHeader = await AuthHeaders();
-    const response = await fetch(`${API_URL}/locations/${store}`,
-        {
+
+    // 1. Obtenemos todo en paralelo para que sea rápido
+    const [resStore, resManagers, resLocations] = await Promise.all([
+        fetch(`${API_URL}/locations/${store}`, {
             headers: authHeader.headers,
-            method: "GET",
-            next: {
-                tags: ["dashboard:locations", `dashboard:locations:${store}`]
-            }
-        }
-    )
-    const data: Location = await response.json();
+            next: { tags: ["dashboard:locations", `dashboard:locations:${store}`] }
+        }),
+        fetch(`${API_URL}/managers`, {
+            headers: authHeader.headers,
+            next: { tags: ["dashboard:managers"] }
+        }),
+        fetch(`${API_URL}/locations`, {
+            headers: authHeader.headers,
+            next: { tags: ["dashboard:locations"] }
+        })
+    ]);
+
+    const data: Location = await resStore.json();
+    const managers: Manager[] = await resManagers.json();
+    const locations: Location[] = await resLocations.json();
+
     return (
-        <div className="rounded-xl bg-white shadow-sm border border-gray-100 overflow-hidden">
+        <div className="rounded-xl bg-white shadow-sm border border-gray-100 overflow-hidden relative">
+            <div className="absolute right-4 top-4 z-10">
+                <UpdateLocation>
+                    {/* 2. Pasamos las propiedades faltantes aquí 👇 */}
+                    <FormUpdateLocation
+                        store={store}
+                        managers={managers}
+                        locations={locations}
+                    />
+                </UpdateLocation>
+            </div>
             <div className="px-5 pt-4">
                 <p className="text-lg font-bold text-gray-900">{data.locationName}</p>
             </div>
