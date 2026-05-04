@@ -53,13 +53,13 @@ const LocationsPage = async ({ searchParams }: {
                         <FormNewLocation store={resolvedSearchParams.store} />
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-row grow-0 items-center gap-2">
                         <DeleteLocationButton store={resolvedSearchParams.store} />
                         <UpdateLocation>
-                            <FormUpdateLocation 
-                                store={resolvedSearchParams.store} 
-                                managers={managers} 
-                                locations={data} 
+                            <FormUpdateLocation
+                                store={resolvedSearchParams.store}
+                                managers={managers}
+                                locations={data}
                             />
                         </UpdateLocation>
                     </div>

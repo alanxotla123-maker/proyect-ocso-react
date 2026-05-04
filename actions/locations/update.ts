@@ -4,8 +4,9 @@ import { API_URL } from "@/constants";
 import { AuthHeaders } from "@/helpers/authHeaders";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { Location } from "@/entities";
 
-async function updateLocation(locationId: number, formData: FormData) {
+async function updateLocation(store: string, formData: FormData) {
     const location: any = {
         locationName: formData.get("locationName"),
         locationAddress: formData.get("locationAddress"),
@@ -23,7 +24,7 @@ async function updateLocation(locationId: number, formData: FormData) {
     const authHeader = await AuthHeaders();
 
     try {
-        const response = await fetch(`${API_URL}/locations/${locationId}`, {
+        const response = await fetch(`${API_URL}/locations/${store}`, {
             method: "PATCH",
             body: JSON.stringify(location),
             headers: {
@@ -31,19 +32,25 @@ async function updateLocation(locationId: number, formData: FormData) {
                 "Content-Type": "application/json"
             }
         });
+        
+        const data = await response.json();
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Error al actualizar la ubicación");
+        // En PATCH, usualmente el estado es 200 (OK), no 201 (Created)
+        if (response.ok) {
+            revalidatePath("/dashboard", "page");
+            redirect(`/dashboard/?store=${store}`);
+        } else {
+            throw new Error(data.message || "Error al actualizar la ubicación");
         }
 
     } catch (error: any) {
+        // MUY IMPORTANTE: Next.js usa errores internos para hacer la redirección. 
+        // Si no lanzas este error de vuelta, la página nunca se recargará.
         if (error.message === "NEXT_REDIRECT") throw error;
-        console.error("Error updating location:", error);
+        
+        console.error("Error:", error);
         throw new Error(error.message || "Error al actualizar la ubicación");
     }
-
-    revalidatePath("/dashboard", "page");
 }
 
 export default updateLocation;
