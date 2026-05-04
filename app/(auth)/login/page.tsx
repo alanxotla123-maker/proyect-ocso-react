@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { Input, Button } from "@nextui-org/react";
 import { API_URL } from "@/constants";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -10,7 +9,7 @@ export default function LoginPage() {
     const [submitting, setSumitting] = useState(false)
     const router = useRouter();
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: any) => {
         setSumitting(true);
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
@@ -18,13 +17,19 @@ export default function LoginPage() {
         authData.userEmail = formData.get("userEmail");
         authData.userPassword = formData.get("userPassword");
         try {
-            const response = await axios.post(`${API_URL}/auth/login`, {
-                ...authData
-            }, {
-                withCredentials: true
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(authData),
+                credentials: "include",
             });
+
             if (response.status === 201) {
                 router.push("/dashboard");
+            } else {
+                setSumitting(false);
             }
         } catch (e) {
             setSumitting(false);

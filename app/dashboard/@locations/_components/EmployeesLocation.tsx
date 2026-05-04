@@ -1,5 +1,4 @@
 import { Employee } from "@/entities";
-import axios from "axios";
 import { API_URL } from "@/constants";
 import { AuthHeaders } from "@/helpers/authHeaders";
 
@@ -7,7 +6,17 @@ export default async function EmployeesLocation({ store }: { store: string | str
     if (!store) return null;
 
     const authHeader = await AuthHeaders();
-    const { data } = await axios.get<Employee[]>(`${API_URL}/employees/location/${store}`, authHeader);
+    const response = await fetch(`${API_URL}/employees/location/${store}`, {
+        method: "GET",
+        headers: {
+            ...authHeader.headers,
+            "Content-Type": "application/json"
+        },
+        next: {
+            tags: ["dashboard:locations"]
+        }
+    });
+    const data: Employee[] = await response.json();
 
     if (!data || data.length === 0) {
         return (

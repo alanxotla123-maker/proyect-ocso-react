@@ -11,10 +11,16 @@ export default async function LocationCard({ store }: { store: string | string[]
 
 
     const authHeader = await AuthHeaders();
-    const { data } = await axios.get<Location>(`${API_URL}/locations/${store}`,
-        authHeader
+    const response = await fetch(`${API_URL}/locations/${store}`,
+        {
+            headers: authHeader.headers,
+            method: "GET",
+            next: {
+                tags: ["dashboard:locations", `dashboard:locations:${store}`]
+            }
+        }
     )
-
+    const data: Location = await response.json();
     return (
         <div className="rounded-xl bg-white shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-5 pt-4">

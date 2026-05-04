@@ -1,16 +1,11 @@
 "use server";
 
-import axios from "axios";
 import { API_URL } from "@/constants";
-import { cookies } from "next/headers";
-import { TOKEN_NAME } from "@/constants";
+import { AuthHeaders } from "@/helpers/authHeaders";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 async function createLocation(formData: FormData) {
-    const userCookies = await cookies();
-    const token = userCookies.get(TOKEN_NAME)?.value;
-    if (!token) {
-        throw new Error("No se encontro el token de autenticación");
-    }
     const location: any = {
         locationName: formData.get("locationName"),
         locationAddress: formData.get("locationAddress"),
@@ -26,18 +21,31 @@ async function createLocation(formData: FormData) {
     }
 
     console.log("Sending location:", location);
+
+    const authHeader = await AuthHeaders();
+    
     try {
-        await axios.post(`${API_URL}/locations`, {
-            ...location
-        }, {
+        const response = await fetch(`${API_URL}/locations`, {
+            method: "POST",
+            body: JSON.stringify(location),
             headers: {
-                "Authorization": `Bearer ${token}`
+                ...authHeader.headers,
+                "Content-Type": "application/json"
             }
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error al crear la ubicación");
+        }
+        
     } catch (error: any) {
-        console.error("Backend error:", error.response?.data);
-        throw new Error(error.response?.data?.message || "Error al crear la ubicación");
+        console.error("Error:", error);
+        throw new Error(error.message || "Error al crear la ubicación");
     }
+
+    revalidatePath("/dashboard", "page");
+    redirect("/dashboard");
 }
 
-export default createLocation
+export default createLocation;
