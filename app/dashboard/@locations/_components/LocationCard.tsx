@@ -2,7 +2,8 @@ import { UpdateLocation } from "./UpdateLocation";
 import FormUpdateLocation from "./FormUpdateLocation";
 import { AuthHeaders } from "@/helpers/authHeaders";
 import { API_URL } from "@/constants";
-import { Location, Manager } from "@/entities"; // 👈 Asegúrate de importar Manager
+import { Location, Manager } from "@/entities";
+import Link from "next/link";
 
 export default async function LocationCard({ store }: { store: string | string[] | undefined }) {
     if (!store || store === "0") {
@@ -30,7 +31,6 @@ export default async function LocationCard({ store }: { store: string | string[]
     const data: Location = await resStore.json();
     const managers: Manager[] = await resManagers.json();
     const locations: Location[] = await resLocations.json();
-
     return (
         <div className="rounded-xl bg-white shadow-sm border border-gray-100 overflow-hidden relative">
             <div className="absolute right-4 top-4 z-10">
@@ -47,7 +47,8 @@ export default async function LocationCard({ store }: { store: string | string[]
                 <p className="text-lg font-bold text-gray-900">{data.locationName}</p>
             </div>
             <div className="px-5 pb-3 pt-1">
-                <p className="text-gray-700">Manager:<b className="text-gray-900">{data.manager?.managerFullName}</b></p>
+                <p className="text-gray-700">Manager:<Link href={`/dashboard/managers/${data.manager?.managerId}`}>
+                    <b className="text-gray-900">{data.manager?.managerFullName}</b></Link></p>
             </div>
             <div className="px-5 pb-3 pt-1">
                 <p className="text-gray-700">Dirección:<b className="text-gray-900">{data.locationAddress}</b></p>
