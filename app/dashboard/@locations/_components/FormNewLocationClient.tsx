@@ -23,3 +23,4 @@ export default function FormNewLocationClient({ managers, locations }: { manager
         </form>
     );
 }
+ 
