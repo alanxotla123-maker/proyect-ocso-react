@@ -18,36 +18,42 @@ export default async function ManagerPage({ params }: {
     const manager = await response.json()
     console.log(manager);
     return (
-        <div className="mx-10 my-10 bg-white rounded-xl shadow-md border border-gray-100 flex flex-col">
-            <div className="px-5 py-4 border-b border-gray-100">
-                <p className="w-full text-lg">
-                    Nombre: <b className="text-gray-900">{manager.managerFullName}</b>
-                </p>
+        <div className="mx-10 my-10 bg-white rounded-xl shadow-md border border-gray-200 flex flex-col">
+            <div className="px-5 py-6 border-b border-gray-200 text-center">
+                <h2 className="text-3xl font-bold text-gray-900">{manager.managerFullName}</h2>
             </div>
 
-            <div className="px-5 py-4 flex flex-col gap-3">
-                <p className="w-full text-gray-700">
-                    Email: <b className="text-gray-900">{manager.managerEmail}</b>
-                </p>
-                <p className="w-full text-gray-700">
-                    Teléfono: <b className="text-gray-900">{manager.managerPhoneNumber}</b>
-                </p>
-
-                {manager.location ? (
-                    <>
-                        <p className="text-gray-700">
-                            Tienda: <b className="text-gray-900">{manager.location.locationName}</b>
+            <div className="px-10 py-6 flex flex-row items-center justify-between gap-6">
+                <div className="flex flex-col gap-3 text-lg w-1/2">
+                    <p className="text-gray-900">
+                        <b>Email:</b> {manager.managerEmail}
+                    </p>
+                    <p className="text-gray-900">
+                        <b>Teléfono:</b> {manager.managerPhoneNumber}
+                    </p>
+                    {manager.location ? (
+                        <p className="text-gray-900">
+                            <b>Tienda:</b> <span className="underline font-bold cursor-pointer">{manager.location.locationName}</span>
                         </p>
+                    ) : (
+                        <p className="text-gray-500 italic mt-2">No tiene tienda asignada</p>
+                    )}
+                </div>
+
+                <div className="w-1/2 flex justify-center">
+                    {manager.location ? (
                         <iframe
-                            className="border-2 border-orange-800 rounded-md my-2"
+                            className="border-2 border-orange-800 rounded-md"
                             width="300"
                             height="200"
                             src={`https://www.google.com/maps/embed/v1/place?key=TU_API_KEY_AQUI&q=${manager.location.locationLatLng[0]},${manager.location.locationLatLng[1]}`}
                         ></iframe>
-                    </>
-                ) : (
-                    <p className="text-gray-500 italic mt-2">No tiene tienda asignada</p>
-                )}
+                    ) : (
+                        <div className="w-[300px] h-[200px] border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center text-gray-400">
+                            Sin mapa
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )

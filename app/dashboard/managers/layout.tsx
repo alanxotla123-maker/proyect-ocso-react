@@ -4,8 +4,9 @@ import { AuthHeaders } from "@/helpers/authHeaders";
 import { API_URL } from "@/constants";
 import { Manager } from "@/entities";
 
-export default async function LayoutManager({ children }: {
+export default async function LayoutManager({ children, count }: {
     children: ReactNode
+    count: ReactNode
 }) {
     const authHeader = await AuthHeaders()
 
@@ -25,9 +26,11 @@ export default async function LayoutManager({ children }: {
         <div className="w-full flex justify-center">
             <div className="w-4/12 h-[90vh] overflow-y-auto overflow-hidden">
                 <ManagerCards managers={data} />
+
             </div>
             <div className="w-8/12">
                 {children}
+                {count}
             </div>
         </div>
     )
