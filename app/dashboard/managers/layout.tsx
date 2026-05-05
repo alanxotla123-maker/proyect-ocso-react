@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import ManagerCards from "./_components/ManagerCard"
+import ManagerCards from "./[id]/_components/ManagerCard"
 import { AuthHeaders } from "@/helpers/authHeaders";
 import { API_URL } from "@/constants";
 import { Manager } from "@/entities";

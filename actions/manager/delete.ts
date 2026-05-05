@@ -3,6 +3,7 @@
 import { API_URL } from "@/constants"
 import { AuthHeaders } from "@/helpers/authHeaders";
 import { revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 
 export default async function deleteManager(managerId: string, formData: FormData) {
 
@@ -15,6 +16,10 @@ export default async function deleteManager(managerId: string, formData: FormDat
             "Content-Type": "application/json"
         },
     })
-    revalidateTag("dashboard:managers", "page")
+    if (response.status == 200) {
+        revalidateTag("dashboard:managers", "page")
+        redirect("/dashboard/managers")
+    }
+
 
 }
